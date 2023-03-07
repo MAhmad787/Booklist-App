@@ -6,23 +6,36 @@ class Book {
     this.isbn = isbn;
   }
 }
-
+// Store Class
+class Store {
+  static getBooks() {
+    let books;
+    if (localStorage.getItem('books') === null) {
+      books = [];
+    } else {
+      books = JSON.parse(localStorage.getItem('books'));
+    }
+    return books;
+  }
+  static addBook(book) {
+    const books = Store.getBooks();
+    books.push(book);
+    localStorage.setItem('books', JSON.stringify(books));
+  }
+  static removeBook(isbn) {
+    const books = Store.getBooks();
+    books.forEach((book, index) => {
+      if (book.isbn === index) {
+      }
+      books.splice(index, 1);
+    });
+    localStorage.setItem('books', JSON.stringify(books));
+  }
+}
 // Class Dealing with UI
 class UI {
   static displayBooks() {
-    const storedBooks = [
-      {
-        title: 'Sinfe Adab',
-        author: 'Ali Nasir',
-        isbn: '912345',
-      },
-      {
-        title: 'Sinfe Urdu',
-        author: 'Majid Ali',
-        isbn: '7869998',
-      },
-    ];
-    const books = storedBooks;
+    const books = Store.getBooks();
     books.forEach((book) => UI.addBookToList(book));
   }
   static addBookToList(book) {
@@ -78,6 +91,7 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
     //   Instatiate Book
     const book = new Book(title, author, isbn);
     UI.addBookToList(book);
+    Store.addBook(book);
     UI.alertMessage('Book Added', 'success');
 
     //   Clearing the fields
@@ -88,5 +102,6 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
 document.querySelector('#book-list').addEventListener('click', (e) => {
   // Remove book from UI
   UI.deleteBook(e.target);
+  Store.removeBook(e.target.parentElement.previousElementSibling.innerText);
   UI.alertMessage('Book Removed', 'success');
 });
